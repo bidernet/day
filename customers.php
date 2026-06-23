@@ -34,6 +34,14 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $customers = $stmt->fetchAll();
 
+// סיכומי הלשונית (לא מושפעים מהחיפוש/סינון)
+$sum_customers   = (int)   $pdo->query("SELECT COUNT(*) FROM customers")->fetchColumn();
+$monthly_income  = (float) $pdo->query("SELECT IFNULL(SUM(amount),0) FROM retainers WHERE status='active'")->fetchColumn();
+$open_debt_total = (float) $pdo->query("
+    SELECT IFNULL(SUM(GREATEST(d.amount - IFNULL((SELECT SUM(p.amount) FROM payments p WHERE p.debt_id=d.id),0),0)),0)
+    FROM debts d WHERE d.status='open'
+")->fetchColumn();
+
 $active = 'customers';
 $page_title = 'לקוחות';
 include __DIR__ . '/includes/header.php';
@@ -55,6 +63,24 @@ include __DIR__ . '/includes/header.php';
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>
     לקוח חדש
   </a>
+</div>
+
+<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+  <div class="kpi">
+    <div class="label">כמות לקוחות</div>
+    <div class="value num"><?= $sum_customers ?></div>
+    <div class="sub">סך הלקוחות במערכת</div>
+  </div>
+  <div class="kpi">
+    <div class="label">הכנסה חודשית קבועה</div>
+    <div class="value num"><?= money_short($monthly_income) ?></div>
+    <div class="sub">סך הריטיינרים החודשיים הפעילים</div>
+  </div>
+  <div class="kpi">
+    <div class="label">סך חוב פתוח</div>
+    <div class="value num <?= $open_debt_total>0?'danger':'' ?>"><?= money_short($open_debt_total) ?></div>
+    <div class="sub">סך החוב של כל הלקוחות</div>
+  </div>
 </div>
 
 <div class="card">

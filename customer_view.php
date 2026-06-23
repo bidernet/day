@@ -3,6 +3,7 @@ require_once __DIR__ . '/includes/auth.php';
 require_login();
 $pdo = db();
 retainers_bootstrap($pdo); // יצירה אוטומטית של חיובי ריטיינר חודשיים
+ensure_bank_schema($pdo);
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $stmt = $pdo->prepare("SELECT * FROM customers WHERE id=?");
@@ -68,6 +69,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     exit;
 }
 
+// ---- בנק חבילות: הוספה ----
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add_bank') {
+    csrf_check();
+    $btitle = trim($_POST['b_title'] ?? '');
+    $bqty   = max(1, (int)($_POST['b_qty'] ?? 0));
+    $bprice = (float)str_replace(',', '', $_POST['b_price'] ?? '0');
+    if ($btitle === '') {
+        $error = 'יש להזין שם לחבילה (למשל "10 פוסטים").';
+    } else {
+        $pdo->prepare("INSERT INTO service_banks (customer_id, title, total_qty, price) VALUES (?,?,?,?)")
+            ->execute([$id, $btitle, $bqty, $bprice]);
+        flash('הבנק נוסף לכרטיס.');
+        header('Location: customer_view.php?id=' . $id);
+        exit;
+    }
+}
+
+// ---- בנק חבילות: סימון ביצוע (+1 / -1) ----
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'bank_use') {
+    csrf_check();
+    $bid   = (int)($_POST['bank_id'] ?? 0);
+    $delta = ((int)($_POST['delta'] ?? 0)) >= 0 ? 1 : -1;
+    $pdo->prepare("UPDATE service_banks
+                   SET used_qty = LEAST(GREATEST(used_qty + ?, 0), total_qty),
+                       status = IF(used_qty + ? >= total_qty, 'closed', 'active')
+                   WHERE id=? AND customer_id=?")
+        ->execute([$delta, $delta, $bid, $id]);
+    header('Location: customer_view.php?id=' . $id);
+    exit;
+}
+
+// ---- בנק חבילות: מחיקה ----
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_bank') {
+    csrf_check();
+    $bid = (int)($_POST['bank_id'] ?? 0);
+    $pdo->prepare("DELETE FROM service_banks WHERE id=? AND customer_id=?")->execute([$bid, $id]);
+    flash('הבנק נמחק.');
+    header('Location: customer_view.php?id=' . $id);
+    exit;
+}
+
 // שליפת חובות עם יתרה
 $debts = $pdo->prepare("
     SELECT d.*, IFNULL((SELECT SUM(p.amount) FROM payments p WHERE p.debt_id=d.id),0) AS paid
@@ -92,6 +134,11 @@ $retainers->execute([$id]);
 $retainers = $retainers->fetchAll();
 $hasActiveRetainer = false;
 foreach ($retainers as $rr) { if ($rr['status'] === 'active') { $hasActiveRetainer = true; break; } }
+
+// בנקים (חבילות שירות)
+$banks = $pdo->prepare("SELECT * FROM service_banks WHERE customer_id=? ORDER BY (status='closed'), created_at DESC");
+$banks->execute([$id]);
+$banks = $banks->fetchAll();
 
 // סיכומים
 $balance = 0; $total_amount = 0; $total_paid = 0;
@@ -257,6 +304,61 @@ include __DIR__ . '/includes/header.php';
         <div class="field"><label>תאריך התחלה</label><input type="date" name="r_start_date" value="<?= date('Y-m-d') ?>"></div>
       </div>
       <div class="form-actions"><button class="btn" type="submit">הוסף ריטיינר</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head"><h2>בנק חבילות</h2></div>
+  <div class="card-body">
+    <?php foreach ($banks as $b):
+      $unit      = $b['total_qty'] > 0 ? $b['price'] / $b['total_qty'] : 0;
+      $remaining = max(0, $b['total_qty'] - $b['used_qty']);
+      $usedVal   = $unit * $b['used_qty'];
+      $remVal    = $b['price'] - $usedVal;
+      $pct       = $b['total_qty'] > 0 ? round($b['used_qty'] / $b['total_qty'] * 100) : 0;
+      $done      = $b['used_qty'] >= $b['total_qty'];
+    ?>
+      <div class="bank-row">
+        <div class="bank-info">
+          <div class="bank-title">
+            <strong><?= e($b['title']) ?></strong>
+            <?php if ($done): ?><span class="badge badge-paid"><span class="pip"></span>הושלם</span><?php endif; ?>
+            <span class="muted">· <?= money_short($b['price']) ?> לחבילה</span>
+          </div>
+          <div class="bankbar"><i style="width:<?= $pct ?>%"></i></div>
+          <div class="bank-stats">
+            <span>בוצעו <strong class="num"><?= (int)$b['used_qty'] ?></strong> מתוך <strong class="num"><?= (int)$b['total_qty'] ?></strong></span>
+            <span>· נותרו <strong class="num"><?= $remaining ?></strong></span>
+            <span>· נותר לבצע בשווי <strong style="color:var(--danger)"><?= money_short($remVal) ?></strong></span>
+          </div>
+        </div>
+        <div class="bank-actions">
+          <form method="post" style="display:inline"><?= csrf_field() ?>
+            <input type="hidden" name="action" value="bank_use"><input type="hidden" name="bank_id" value="<?= (int)$b['id'] ?>"><input type="hidden" name="delta" value="-1">
+            <button class="btn btn-ghost btn-sm" type="submit" <?= $b['used_qty']<=0?'disabled':'' ?>>−</button>
+          </form>
+          <form method="post" style="display:inline"><?= csrf_field() ?>
+            <input type="hidden" name="action" value="bank_use"><input type="hidden" name="bank_id" value="<?= (int)$b['id'] ?>"><input type="hidden" name="delta" value="1">
+            <button class="btn btn-ok btn-sm" type="submit" <?= $done?'disabled':'' ?>>+ סמן ביצוע</button>
+          </form>
+          <form method="post" style="display:inline" onsubmit="return confirm('למחוק את הבנק?')"><?= csrf_field() ?>
+            <input type="hidden" name="action" value="delete_bank"><input type="hidden" name="bank_id" value="<?= (int)$b['id'] ?>">
+            <button class="btn btn-danger-ghost btn-sm" type="submit">מחק</button>
+          </form>
+        </div>
+      </div>
+    <?php endforeach; ?>
+
+    <form method="post" style="margin-top:<?= $banks ? '18px' : '0' ?>">
+      <?= csrf_field() ?>
+      <input type="hidden" name="action" value="add_bank">
+      <div class="form-grid">
+        <div class="field"><label>שם החבילה <span class="req">*</span></label><input type="text" name="b_title" placeholder="למשל: 10 פוסטים" required></div>
+        <div class="field"><label>כמות <span class="req">*</span></label><input type="number" name="b_qty" min="1" value="10" required></div>
+        <div class="field"><label>מחיר כולל לחבילה (₪)</label><input type="text" name="b_price" inputmode="decimal" placeholder="0.00"></div>
+      </div>
+      <div class="form-actions"><button class="btn" type="submit">הוסף בנק</button></div>
     </form>
   </div>
 </div>

@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 
 // כבר מחובר? לדשבורד
-if (!empty($_SESSION['user_id'])) { header('Location: index.php'); exit; }
+if (!empty($_SESSION['user_id'])) { header('Location: ./'); exit; }
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         session_regenerate_id(true);
         $_SESSION['user_id']   = $u['id'];
         $_SESSION['user_name'] = $u['full_name'];
-        header('Location: index.php');
+        header('Location: ./');
         exit;
     }
     $error = 'שם משתמש או סיסמה שגויים.';
@@ -26,6 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <title>התחברות · <?= e(APP_NAME) ?></title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
