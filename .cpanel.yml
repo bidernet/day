@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/biderne1/public_html/day.bidernet.co.il/
+    - /usr/bin/rsync -rlt --no-perms --no-owner --no-group --exclude='.git' --exclude='.gitignore' --exclude='.cpanel.yml' --exclude='/config.php' --exclude='/.htaccess' --exclude='/install.php' --exclude='*.md' /home/biderne1/repositories/day/ "$DEPLOYPATH"
+    - /bin/rm -f "${DEPLOYPATH}install.php"
+    - /bin/chmod 600 "${DEPLOYPATH}config.php"

@@ -1,0 +1,266 @@
+/* ============================================================
+   bidernet – ניהול לקוחות | גיליון עיצוב (סגנון לבן + ליים)
+   ============================================================ */
+
+/* ----- גופן המערכת: PingHL -----
+   הקובץ נמצא ב-assets/PingHL-Regular.woff2 ומוטמע בכל המערכת דרך --font-main.
+   להוספת משקלים נוספים (Bold וכו'), הוסף בלוקי @font-face נוספים עם font-weight מתאים. */
+@font-face {
+  font-family: 'PingHL';
+  src: url('PingHL-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --lime:      #c6f02e;
+  --lime-d:    #b3df17;
+  --lime-soft: #f0fbcf;
+
+  --bg:        #f5f7f9;
+  --surface:   #ffffff;
+  --sidebar:   #ffffff;
+  --text:      #181b1d;
+  --muted:     #6b7480;
+  --line:      #ebeef1;
+  --line-2:    #f3f5f7;
+
+  --danger:    #e23b32;  --danger-bg:#fdeceb;
+  --warn:      #e08a17;  --warn-bg:  #fdf3e0;
+  --ok:        #1aa256;  --ok-bg:    #e7f6ed;
+
+  --radius:    14px;
+  --radius-s:  9px;
+  --shadow:    0 1px 2px rgba(24,27,29,.04), 0 4px 16px rgba(24,27,29,.05);
+
+  --font-main: 'PingHL', 'Heebo', system-ui, 'Segoe UI', sans-serif;
+  --font-head: var(--font-main);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+h1, h2, h3, .display { font-family: var(--font-head); font-weight: 700; letter-spacing: -.01em; margin: 0; }
+a { color: var(--text); text-decoration: none; }
+a:hover { color: #000; }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* ---------- מבנה ---------- */
+.layout { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 252px; flex-shrink: 0;
+  background: var(--sidebar);
+  border-inline-start: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh;
+}
+.brand { padding: 22px 24px 16px; }
+.brand .logo {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 800; color: #111; letter-spacing: -.02em;
+  display: flex; align-items: baseline; gap: 6px;
+}
+.brand .logo .grp { font-size: 12px; font-weight: 500; color: var(--muted); font-style: italic; }
+
+.nav { padding: 8px 12px; flex: 1; }
+.nav-section { font-size: 12px; color: #a2abb4; font-weight: 600; padding: 16px 12px 6px; }
+.nav a {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  color: #3b444c; font-size: 14.5px; font-weight: 500;
+  margin-bottom: 2px; transition: background .14s, color .14s;
+}
+.nav a svg { width: 19px; height: 19px; opacity: .9; flex-shrink: 0; }
+.nav a:hover { background: #f3f5f7; color: #111; }
+.nav a.active { background: var(--lime); color: #14180b; font-weight: 700; box-shadow: 0 4px 12px rgba(160,200,20,.35); }
+.nav a.active svg { opacity: 1; }
+.nav .badge-count {
+  margin-inline-start: auto; background: #2a2f34; color: #fff;
+  font-size: 11.5px; font-weight: 700; border-radius: 20px;
+  padding: 1px 8px; min-width: 20px; text-align: center;
+}
+.nav a.active .badge-count { background: #14180b; color: var(--lime); }
+
+.side-foot {
+  padding: 14px 18px; border-top: 1px solid var(--line);
+  font-size: 13px; color: var(--muted);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.side-foot .who { display: flex; align-items: center; gap: 9px; }
+.side-foot .ava { width: 28px; height: 28px; border-radius: 50%; background: var(--lime); color: #14180b; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+.side-foot a:hover { color: var(--danger); }
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+  min-height: 64px; background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; gap: 16px; padding: 0 26px;
+}
+.topbar .greet { display: flex; align-items: center; gap: 9px; font-size: 15px; color: #2a2f34; }
+.topbar .greet svg { width: 19px; height: 19px; color: #f0b51e; }
+.topbar .greet b { font-weight: 700; }
+.topbar .spacer { flex: 1; }
+
+.content { padding: 26px; max-width: 1200px; width: 100%; }
+
+/* ---------- כפתורים ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: inherit; font-size: 14.5px; font-weight: 700;
+  padding: 10px 18px; border-radius: 10px; border: 1px solid transparent;
+  cursor: pointer; background: var(--lime); color: #14180b;
+  transition: background .14s, box-shadow .14s, transform .05s; white-space: nowrap;
+}
+.btn:hover { background: var(--lime-d); color: #14180b; box-shadow: 0 6px 16px rgba(160,200,20,.35); }
+.btn:active { transform: translateY(1px); }
+.btn svg { width: 18px; height: 18px; }
+.btn-dark { background: #1f2429; color: #fff; }
+.btn-dark:hover { background: #2c3238; color: #fff; box-shadow: none; }
+.btn-ghost { background: #fff; color: var(--text); border-color: var(--line); font-weight: 600; }
+.btn-ghost:hover { background: #fff; border-color: #c9cfd5; color: #000; box-shadow: none; }
+.btn-ok { background: var(--ok); color: #fff; }
+.btn-ok:hover { background: #15834597; background: #158345; color: #fff; box-shadow: none; }
+.btn-danger-ghost { background: #fff; color: var(--danger); border-color: #f3d2cf; font-weight: 600; }
+.btn-danger-ghost:hover { background: var(--danger-bg); color: var(--danger); box-shadow: none; }
+.btn-sm { padding: 7px 13px; font-size: 13.5px; }
+
+/* ---------- כרטיסי KPI ---------- */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); }
+.kpi .label { font-size: 14px; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.kpi .value { font-size: 30px; font-weight: 800; margin-top: 10px; line-height: 1.1; letter-spacing: -.02em; }
+.kpi .sub { font-size: 13px; color: var(--muted); margin-top: 5px; }
+.kpi.hero { background: var(--lime); border-color: var(--lime); color: #14180b; box-shadow: 0 6px 20px rgba(160,200,20,.30); }
+.kpi.hero .label { color: rgba(20,24,11,.62); }
+.kpi.hero .value { color: #14180b; }
+.kpi.hero .value .cur { color: #14180b; }
+.kpi.hero .sub { color: rgba(20,24,11,.62); }
+.kpi .value.danger { color: var(--danger); }
+
+/* ---------- כרטיסים / מקטעים ---------- */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 22px; overflow: hidden; }
+.card-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line-2); }
+.card-head h2 { font-size: 16.5px; }
+.card-head .spacer { flex: 1; }
+.card-body { padding: 20px; }
+.card-body.flush { padding: 0; }
+
+/* ---------- טבלאות ---------- */
+table.data { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+table.data th { text-align: right; font-weight: 600; font-size: 12.5px; color: var(--muted); padding: 12px 18px; border-bottom: 1px solid var(--line); background: #fafbfc; white-space: nowrap; }
+table.data td { padding: 13px 18px; border-bottom: 1px solid var(--line-2); vertical-align: middle; }
+table.data tbody tr:last-child td { border-bottom: none; }
+table.data tbody tr:hover { background: #fafcfb; }
+table.data td.money { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.row-overdue { background: #f6fce0 !important; }
+.row-overdue:hover { background: #eef9c7 !important; }
+.cust-link { font-weight: 600; color: var(--text); }
+.cust-link:hover { color: #000; text-decoration: underline; text-decoration-color: var(--lime-d); text-underline-offset: 3px; }
+.muted { color: var(--muted); }
+.t-left { text-align: left; }
+.nowrap { white-space: nowrap; }
+
+/* ---------- תגיות מצב ---------- */
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.badge .pip { width: 7px; height: 7px; border-radius: 50%; }
+.badge-overdue { background: var(--lime); color: #14180b; } .badge-overdue .pip { background: #14180b; }
+.badge-soon { background: var(--warn-bg); color: var(--warn); } .badge-soon .pip { background: var(--warn); }
+.badge-ok { background: var(--ok-bg); color: var(--ok); } .badge-ok .pip { background: var(--ok); }
+.badge-paid { background: var(--ok-bg); color: var(--ok); }
+.badge-neutral { background: #eef1f3; color: var(--muted); } .badge-neutral .pip { background: var(--muted); }
+
+/* ---------- טפסים ---------- */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+.form-grid .full { grid-column: 1 / -1; }
+.field label { display: block; font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.field label .req { color: var(--danger); }
+.field input, .field select, .field textarea {
+  width: 100%; font-family: inherit; font-size: 14.5px; padding: 10px 12px;
+  border: 1px solid var(--line); border-radius: var(--radius-s); background: #fff; color: var(--text);
+  transition: border-color .14s, box-shadow .14s;
+}
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--lime-d); box-shadow: 0 0 0 3px var(--lime-soft); }
+.field textarea { resize: vertical; min-height: 84px; }
+.field .hint { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+.form-actions { display: flex; gap: 10px; margin-top: 22px; }
+
+/* ---------- פלאש / התראות ---------- */
+.flash { background: var(--lime-soft); color: #3f5106; border: 1px solid #d7ef9a; padding: 12px 16px; border-radius: var(--radius-s); margin-bottom: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.alert-box { padding: 12px 16px; border-radius: var(--radius-s); margin-bottom: 16px; font-size: 14px; }
+.alert-error { background: var(--danger-bg); color: var(--danger); border: 1px solid #f3d2cf; }
+.empty { text-align: center; padding: 46px 20px; color: var(--muted); }
+.empty svg { width: 40px; height: 40px; opacity: .4; margin-bottom: 10px; }
+.empty p { margin: 0 0 14px; }
+
+/* ---------- כרטיס לקוח ---------- */
+.cust-header { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 22px; }
+.avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--lime); color: #14180b; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 25px; font-weight: 800; flex-shrink: 0; }
+.cust-header .info h1 { font-size: 24px; }
+.cust-header .meta { color: var(--muted); font-size: 14px; margin-top: 6px; display: flex; flex-wrap: wrap; gap: 14px; }
+.cust-header .meta span { display: inline-flex; align-items: center; gap: 6px; }
+.cust-header .actions { margin-inline-start: auto; display: flex; gap: 8px; }
+.balance-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 22px; }
+.balance-strip .cell { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.balance-strip .cell .l { font-size: 13px; color: var(--muted); }
+.balance-strip .cell .v { font-size: 22px; font-weight: 800; margin-top: 4px; letter-spacing: -.02em; }
+.balance-strip .cell .v.danger { color: var(--danger); }
+.balance-strip .cell .v.ok { color: var(--ok); }
+
+/* ---------- מסך התחברות ---------- */
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #ffffff; padding: 20px; }
+.login-card { background: var(--surface); width: 100%; max-width: 380px; border-radius: 18px; padding: 34px 32px; border: 1px solid var(--line); box-shadow: 0 10px 40px rgba(24,27,29,.10); }
+.login-card .logo { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: #111; letter-spacing: -.02em; margin-bottom: 2px; }
+.login-card .sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.login-card .field { margin-bottom: 16px; }
+.login-card .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; }
+
+/* ---------- כותרת עמוד / כלים ---------- */
+.page-actions { display: flex; align-items: center; margin-bottom: 20px; gap: 12px; }
+.page-actions .spacer { flex: 1; }
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.toolbar input[type=search], .toolbar select { font-family: inherit; font-size: 14px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius-s); background: #fff; }
+.toolbar input[type=search] { min-width: 240px; }
+
+/* ---------- רספונסיב ---------- */
+@media (max-width: 960px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .form-grid { grid-template-columns: 1fr; } .balance-strip { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; flex-direction: row; align-items: center; overflow-x: auto; border-inline-start: none; border-bottom: 1px solid var(--line); }
+  .brand { padding: 12px 16px; white-space: nowrap; }
+  .nav { display: flex; padding: 8px; gap: 4px; }
+  .nav-section { display: none; }
+  .nav a { margin-bottom: 0; padding: 9px 12px; white-space: nowrap; }
+  .nav a span.t { display: none; }
+  .side-foot { display: none; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .content { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .topbar .greet span.nm { display: none; }
+  .cust-header { flex-wrap: wrap; } .cust-header .actions { margin-inline-start: 0; width: 100%; }
+  table.data { font-size: 13.5px; } table.data th, table.data td { padding: 10px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+:focus-visible { outline: 2px solid var(--lime-d); outline-offset: 2px; }
+
+/* ----- לוגו ----- */
+.logo-img{height:32px;width:auto;display:block}
+.login-card .logo-img{height:34px;margin-bottom:16px}
+
+/* ----- ריטיינר ----- */
+.badge-retainer { background: var(--lime-soft); color: #46500e; }
+.badge-retainer .pip { background: var(--lime-d); }
+.retainer-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line-2); flex-wrap: wrap; }
+.retainer-row:first-child { padding-top: 0; }
