@@ -370,3 +370,20 @@ function ensure_reminder_log_schema($pdo) {
         INDEX idx_hosting (hosting_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
+
+/* ---------- בנק חבילות (גרפיקות/פוסטים) ---------- */
+
+/** מוודא טבלת בנקים */
+function ensure_bank_schema($pdo) {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS service_banks (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        customer_id INT NOT NULL,
+        title VARCHAR(160) NOT NULL,
+        total_qty INT NOT NULL DEFAULT 0,
+        used_qty INT NOT NULL DEFAULT 0,
+        price DECIMAL(12,2) NOT NULL DEFAULT 0,
+        status ENUM('active','closed') NOT NULL DEFAULT 'active',
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_customer (customer_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}

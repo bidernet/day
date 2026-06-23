@@ -46,6 +46,9 @@ $initial = mb_substr(trim($user['name']), 0, 1, 'UTF-8');
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <title><?= e($page_title) ?> · <?= e(APP_NAME) ?></title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,10 +58,10 @@ $initial = mb_substr(trim($user['name']), 0, 1, 'UTF-8');
 <body>
 <div class="layout">
   <aside class="sidebar">
-    <div class="brand"><img class="logo-img" src="assets/logo.png" alt="bidernet"></div>
+    <div class="brand"><a href="./"><img class="logo-img" src="assets/logo.png" alt="bidernet"></a></div>
     <nav class="nav">
       <div class="nav-section">ניווט</div>
-      <a href="index.php" class="<?= $active==='dashboard'?'active':'' ?>"><?= nav_icon('dashboard') ?><span class="t">ראשי</span></a>
+      <a href="./" class="<?= $active==='dashboard'?'active':'' ?>"><?= nav_icon('dashboard') ?><span class="t">ראשי</span></a>
       <a href="customers.php" class="<?= $active==='customers'?'active':'' ?>"><?= nav_icon('customers') ?><span class="t">לקוחות</span></a>
       <a href="debts.php" class="<?= $active==='debts'?'active':'' ?>"><?= nav_icon('debts') ?><span class="t">חובות והתראות</span><?php if ($debtor_count>0): ?><span class="badge-count num"><?= $debtor_count ?></span><?php endif; ?></a>
       <a href="hosting.php" class="<?= $active==='hosting'?'active':'' ?>"><?= nav_icon('hosting') ?><span class="t">אחסון אתרים</span><?php if ($hosting_alert_count>0): ?><span class="badge-count num"><?= $hosting_alert_count ?></span><?php endif; ?></a>
