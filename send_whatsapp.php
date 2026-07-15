@@ -25,7 +25,7 @@ if (empty($site['phone'])) {
     header('Location: ' . $return); exit;
 }
 
-$result = megasend_send_text($site['phone'], renewal_reminder_text($site));
+$result = greenapi_send_text($site['phone'], renewal_reminder_text($site));
 
 if (!empty($result['ok'])) {
     $pdo->prepare("UPDATE hosting SET last_reminder_at = NOW() WHERE id=?")->execute([$id]);

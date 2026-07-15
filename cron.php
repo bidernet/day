@@ -29,8 +29,8 @@ $pdo = db();
 ensure_hosting_schema($pdo);
 ensure_reminder_log_schema($pdo);
 
-if (!megasend_enabled()) {
-    echo "אינטגרציית WhatsApp לא מוגדרת (MEGASEND_TOKEN / MEGASEND_INSTANCE_ID). יציאה.\n";
+if (!greenapi_enabled()) {
+    echo "GREEN API לא מוגדר (GREENAPI_ID / GREENAPI_TOKEN). יציאה.\n";
     exit;
 }
 
@@ -53,7 +53,7 @@ foreach ($sites as $s) {
     $claim->execute([$s['id'], $s['renewal_date'], $d]);
     if ($claim->rowCount() === 0) { $skipped++; continue; }
 
-    $res = megasend_send_text($s['phone'], renewal_reminder_text($s));
+    $res = greenapi_send_text($s['phone'], renewal_reminder_text($s));
 
     if (!empty($res['ok'])) {
         $pdo->prepare("UPDATE reminder_log SET status='sent', detail=? WHERE hosting_id=? AND renewal_date=? AND days_before=?")

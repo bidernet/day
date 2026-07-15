@@ -27,6 +27,13 @@ define('MEGASEND_API_URL', 'https://api.megasend.co.il');
 define('MEGASEND_TOKEN', '');        // ה-Access Token (mega_token_...)
 define('MEGASEND_INSTANCE_ID', '');  // מזהה ה-Instance של חשבון ה-WhatsApp Business
 
+// ===== אינטגרציית WhatsApp דרך GREEN API (הספק הפעיל) =====
+// השג את הערכים מלוח הבקרה של GREEN API ב-green-api.com:
+define('GREENAPI_API_URL', 'https://api.green-api.com');
+define('GREENAPI_MEDIA_URL', 'https://media.green-api.com');
+define('GREENAPI_ID', '');      // idInstance (מספר, למשל 1101234567)
+define('GREENAPI_TOKEN', '');   // apiTokenInstance (טוקן ארוך)
+
 // ===== שליחת תזכורות חידוש אוטומטית (cron) =====
 define('REMINDER_DAYS', [14, 3]);    // כמה ימים לפני החידוש לשלוח תזכורת (אפשר להוסיף/לשנות)
 define('CRON_KEY', '');              // מפתח סודי להרצת ה-cron דרך כתובת אינטרנט (אם אין הרצת CLI)
