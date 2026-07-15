@@ -78,12 +78,10 @@ $created = false;
 
 try {
     $pdo->exec($schema);
-    // טבלאות המודולים הנוספים (בטוח — לא דורס נתונים קיימים)
-    if (function_exists('ensure_hosting_schema'))  ensure_hosting_schema($pdo);
+    // מודולים נוספים (הצעות מחיר, הגדרות, בנק חבילות) — יצירה בטוחה
     if (function_exists('ensure_settings_schema')) ensure_settings_schema($pdo);
-    if (function_exists('ensure_quotes_schema'))   ensure_quotes_schema($pdo);
+    if (function_exists('ensure_quote_schema'))    ensure_quote_schema($pdo);
     if (function_exists('ensure_bank_schema'))     ensure_bank_schema($pdo);
-    if (function_exists('ensure_reminder_log_schema')) ensure_reminder_log_schema($pdo);
 } catch (PDOException $e) {
     $error = 'יצירת הטבלאות נכשלה: ' . $e->getMessage();
 }

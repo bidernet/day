@@ -5,6 +5,8 @@
  * לאחר שהכול עובד — מחק את הקובץ.
  */
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/functions.php';
 header('Content-Type: text/html; charset=utf-8');
 
 function ga_call($url) {
@@ -19,9 +21,10 @@ function ga_post($url,$payload){
     $r=curl_exec($ch);$code=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$e=curl_error($ch);curl_close($ch);
     return ['code'=>$code,'body'=>$r,'json'=>json_decode($r,true),'err'=>$e];
 }
-$id = defined('GREENAPI_ID') ? GREENAPI_ID : '';
-$token = defined('GREENAPI_TOKEN') ? GREENAPI_TOKEN : '';
-$api = defined('GREENAPI_API_URL') ? rtrim(GREENAPI_API_URL,'/') : 'https://api.green-api.com';
+$__c = greenapi_cfg();
+$id = $__c['id'];
+$token = $__c['token'];
+$api = $__c['api'];
 
 function row($l,$v,$ok=null){$c=$ok===true?'#1aa256':($ok===false?'#e23b32':'#555');$m=$ok===true?'✓ ':($ok===false?'✗ ':'');
   echo '<tr><td style="padding:8px 14px;border-bottom:1px solid #eee;font-weight:600">'.htmlspecialchars($l).'</td><td style="padding:8px 14px;border-bottom:1px solid #eee;color:'.$c.'">'.$m.nl2br(htmlspecialchars($v)).'</td></tr>';}

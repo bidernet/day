@@ -4,6 +4,22 @@ require_login();
 $pdo = db();
 ensure_hosting_schema($pdo);
 
+// סימון "שולם" — קידום תאריך החידוש בשנה
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'mark_paid') {
+    csrf_check();
+    $sid = (int)($_POST['id'] ?? 0);
+    $st = $pdo->prepare("SELECT renewal_date FROM hosting WHERE id=?");
+    $st->execute([$sid]);
+    $cur = $st->fetchColumn();
+    if ($sid) {
+        $base = $cur ?: date('Y-m-d');
+        $next = date('Y-m-d', strtotime($base . ' +1 year'));
+        $pdo->prepare("UPDATE hosting SET renewal_date=? WHERE id=?")->execute([$next, $sid]);
+        flash('סומן כשולם — תאריך החידוש עודכן ל-' . fmt_date($next) . '.');
+    }
+    header('Location: hosting.php'); exit;
+}
+
 // רשימה
 $sites = $pdo->query("
     SELECT * FROM hosting
@@ -99,6 +115,12 @@ include __DIR__ . '/includes/header.php';
             </td>
             <td class="money"><?= money_short($s['annual_price']) ?></td>
             <td class="t-left nowrap">
+              <?php if ($s['status']==='active'): ?>
+              <form method="post" style="display:inline" onsubmit="return confirm('לסמן שהלקוח שילם? תאריך החידוש יקודם בשנה.')">
+                <?= csrf_field() ?><input type="hidden" name="action" value="mark_paid"><input type="hidden" name="id" value="<?= (int)$s['id'] ?>">
+                <button class="btn btn-ok btn-sm" type="submit">שולם</button>
+              </form>
+              <?php endif; ?>
               <?= reminder_button_html($s, 'hosting.php') ?>
               <a class="btn btn-ghost btn-sm" href="hosting_form.php?id=<?= (int)$s['id'] ?>">עריכה</a>
             </td>
